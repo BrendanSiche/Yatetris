@@ -2,7 +2,7 @@ Yet Another Tetris
 
 This is a quick tetris game I made as a challenge to myself to learn Python.
 
-This is heavilly based on freeCodeCamp.org's tutorial, however, I've made a few changes to the scoring and rotation system
+This is heavilly based on freeCodeCamp.org's tutorial, however, I've made a few changes to the scoring, physics and rotation system
 
 The mechanics are heavilly based on the TGM serie
 - You have a few frames to "lock" a piece in place, even after a drop
