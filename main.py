@@ -1,6 +1,7 @@
 import pygame
 import random
 import copy
+from network import Network
 
 pygame.font.init()
 
@@ -13,6 +14,13 @@ block_size = 30
 
 top_left_x = (s_width - play_width) // 2
 top_left_y = s_height - play_height
+
+m_play_width = 150  
+m_play_height = 300 
+m_block_size = 15
+
+m_top_left_x = 50
+m_top_left_y = 350
 
 
 S = [['.....',
@@ -139,8 +147,6 @@ class Piece(object):
 		self.shape = shape
 		self.color = shape_colors[shapes.index(shape)]
 		self.rotation = 0
-
-
 
 
 def create_grid(locked_pos={}):
@@ -348,6 +354,11 @@ def draw_window(surface, grid, score=0, combo=1):
 			pygame.draw.rect(surface, grid[i][j], (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
 	pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
 	
+	
+	for i in range(len(grid)):
+		for j in range(len(grid[i])):
+			pygame.draw.rect(surface, grid[i][j], (m_top_left_x + j * m_block_size, m_top_left_y + i * m_block_size, m_block_size, m_block_size), 0)
+	pygame.draw.rect(surface, (255, 0, 0), (m_top_left_x, m_top_left_y, m_play_width, m_play_height), 5)
 	draw_grid(surface, grid)
 
 def get_score(pts, score, combo, level):
@@ -376,7 +387,7 @@ def main(win):
 	fall_time = 0
 	fall_speed = 0.17
 	level = 1
-	lock = fall_speed * 100
+	lock = round(fall_speed * 140)
 	pts = 0
 	held = 0
 	cleared_line = 0
@@ -401,7 +412,7 @@ def main(win):
 				while not(valid_space(current_piece, grid)) and current_piece.y > 0:
 						current_piece.y -= 1
 			else:
-				fall_speed * 100
+				lock = round(fall_speed * 140)
 		current_piece.y += 1
 		if not(valid_space(current_piece, grid)) and current_piece.y > 0:
 			lock -= 1
@@ -492,7 +503,7 @@ def main(win):
 			while pts:
 				clear_rows(grid, locked_pos)
 				pts -= pts
-			lock = 50
+			lock = round(fall_speed * 140)
 			held = 0
 		
 		score = get_score(pts, score, combo, level)
