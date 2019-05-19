@@ -447,7 +447,7 @@ def main(win):
 							if not (valid_space(current_piece, grid)):
 								current_piece.x += 1
 								current_piece.rotation +=1
-				if event.key == pygame.K_f and held == 0:
+				if event.key == pygame.K_SPACE and held == 0:
 					held = 1
 					tmp = copy.deepcopy(current_piece)
 					current_piece = copy.deepcopy(hold_piece)
