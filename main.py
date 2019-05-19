@@ -1,9 +1,6 @@
 import pygame
 import random
 import copy
-from network import Network
-
-pygame.font.init()
 
 # GLOBALS VARS
 s_width = 800
@@ -528,6 +525,8 @@ def main_menu(win):
 				main(win)
 	pygame.display.quit()
 
+if __name__ == "__main__":
+    pygame.font.init()
 win = pygame.display.set_mode((s_width, s_height))
 pygame.display.set_caption('Tetris')
-main_menu(win)  # start game
+main_menu(win)
