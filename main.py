@@ -2,35 +2,18 @@ import pygame
 import random
 import copy
 
-# creating the data structure for pieces
-# setting up global vars
-# functions
-# - create_grid
-# - draw_grid
-# - draw_window
-# - rotating shape in main
-# - setting up the main
-
-"""
-10 x 20 square grid
-shapes: S, Z, I, O, J, L, T
-represented in order by 0 - 6
-"""
-
 pygame.font.init()
 
 # GLOBALS VARS
 s_width = 800
 s_height = 700
-play_width = 300  # meaning 300 // 10 = 30 width per block
-play_height = 600  # meaning 600 // 20 = 20 height per block
+play_width = 300  
+play_height = 600 
 block_size = 30
 
 top_left_x = (s_width - play_width) // 2
 top_left_y = s_height - play_height
 
-
-# SHAPE FORMATS
 
 S = [['.....',
       '......',
@@ -187,8 +170,6 @@ def convert_shape_format(shape):
 	return positions
 
 
-
-
 def valid_space(shape, grid):
 	accepted_pos = [[(j, i) for j in range(10) if grid[i][j] == (0, 0, 0)] for i in range(20)]
 	accepted_pos = [j for sub in accepted_pos for j in sub]
@@ -201,7 +182,27 @@ def valid_space(shape, grid):
 	return True
 
 
+def garbage_format(valuey):
+	positions = []
+	j = 0
+	while j < 9:
+		positions.append((j, valuey))
+		j = j+1
+	return positions
 
+
+def	garbage(grid, locked, inc):
+	i = 20 - inc
+	for key in sorted(list(locked)):
+		x, y = key
+		newKey = (x, y - inc)
+		locked[newKey] = locked.pop(key)
+	while i < 20:
+		garbo = garbage_format(i)
+		for pos in garbo:
+			p = (pos[0], pos[1])
+			locked[p] = (115, 115, 115)
+		i += 1
 
 def check_lost(positions):
 	for pos in positions:
@@ -375,7 +376,7 @@ def main(win):
 	fall_time = 0
 	fall_speed = 0.17
 	level = 1
-	lock = 30
+	lock = fall_speed * 100
 	pts = 0
 	held = 0
 	cleared_line = 0
@@ -393,15 +394,14 @@ def main(win):
 		level = round((cleared_line / 10)) + 1
 		if level > i:
 			fall_speed -= 0.05
-			if lock > 10:
-				lock -= 1
 		if fall_time / 1000 > fall_speed:
 			fall_time = 0
 			current_piece.y += 1
 			if not(valid_space(current_piece, grid)) and current_piece.y > 0:
-					current_piece.y -= 1
+				while not(valid_space(current_piece, grid)) and current_piece.y > 0:
+						current_piece.y -= 1
 			else:
-				lock = 30
+				fall_speed * 100
 		current_piece.y += 1
 		if not(valid_space(current_piece, grid)) and current_piece.y > 0:
 			lock -= 1
@@ -447,11 +447,16 @@ def main(win):
 							if not (valid_space(current_piece, grid)):
 								current_piece.x += 1
 								current_piece.rotation +=1
-				if event.key == pygame.K_f and held == 0:
+				if event.key == pygame.K_SPACE and held == 0:
 					held = 1
 					tmp = copy.deepcopy(current_piece)
 					current_piece = copy.deepcopy(hold_piece)
 					hold_piece = tmp
+				if event.key == pygame.K_f:
+					garbage(grid, locked_pos, 3)
+					grid = create_grid(locked_pos)
+					draw_window(win, grid, score, combo)
+					pygame.display.update()
 
 		shape_pos = convert_shape_format(current_piece)
 		ghost = copy.deepcopy(current_piece)
