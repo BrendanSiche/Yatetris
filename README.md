@@ -2,7 +2,8 @@ Yet Another Tetris
 
 This is a quick tetris game I made as a challenge to myself to learn Python.
 
-This is heavilly based on freeCodeCamp.org's tutorial, however, I've made a few changes to the scoring, physics and rotation system
+This is based on freeCodeCamp.org's tutorial, however, I've made a few changes to the scoring, physics and rotation system
+I've also corrected his clearing line method
 
 The mechanics are heavilly based on the TGM serie
 - You have a few frames to "lock" a piece in place, even after a drop
@@ -10,9 +11,9 @@ The mechanics are heavilly based on the TGM serie
 - Clearing a certain ammount of lines will increase the level, and thus the speed of the game
 - The scoring formula is as follow
   Score = ((Level + Lines)/4) x Lines x Combo
-- TGM randomizer (should prevent the same piece from spawning too many times in a row, but contrary to the Nintendo
-style of randomizer, you have no guarantee of seeing a certain piece within 12 draw)
+- I went witht the nintendo style randomizer instead of the TGM one
 
 S and D for clockwise/anticlockwise rotation
-Up key for sonic drop
+Up arrow for sonic drop
+Down arrow to lock piece
 Spacebar to hold a piece

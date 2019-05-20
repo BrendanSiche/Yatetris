@@ -133,7 +133,7 @@ N = [['.....',
       '.....',
       '.....']]
 
-shapes = [S, Z, I, O, J, L, T, N]
+shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128), (0, 0, 0)]
 
 
@@ -144,7 +144,6 @@ class Piece(object):
 		self.shape = shape
 		self.color = shape_colors[shapes.index(shape)]
 		self.rotation = 0
-
 
 def create_grid(locked_pos={}):
 	grid = [[(0, 0, 0) for x in range(10)] for x in range(20)]
@@ -214,15 +213,15 @@ def check_lost(positions):
 			return True
 	return False
 
-
+def get_bag():
+	arr = [S, Z, I, O, J, L, T]
+	return (arr)
 
 def get_shape(bag):
-	arr = [S, Z, I, O, J, L, T]
-	var = random.choice(arr)
-	i = 0
-	while var in bag and i < 5:
-		var = random.choice(arr)
-		i += 1
+	if not bag:
+		bag = get_bag()
+	random.shuffle(bag)
+	var = bag.pop()
 	return Piece(5, 0, var)
 
 
@@ -261,10 +260,37 @@ def	update_score(nscore):
 		
 def clear_rows(grid, locked):
 	inc = 0
+	i = 19
 
-	for i in range(len(grid) - 1, -1, -1):
+	while i > 1:
 		row = grid[i]
 		if (0, 0, 0) not in row:
+			inc += 1
+			ind = i
+			for j in range(len(row)):
+				try:
+					del locked[(j, i)]
+				except:
+					continue
+			for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
+				x, y = key
+				if y < ind:
+					newKey = (x, y + inc)
+					locked[newKey] = locked.pop(key)
+			grid = create_grid(locked)
+			i = 20
+		i -=1
+	return inc
+
+def clear_black(grid, locked):
+	inc = 0
+
+	for i in range(len(grid)):
+		row = grid[i]
+		row2 = grid[i - 1]
+		nbr = row.count((0, 0, 0))
+		nbr2 = row2.count((0, 0, 0))
+		if nbr == 10 and nbr2 < 10:
 			inc += 1
 			ind = i
 			for j in range(len(row)):
@@ -279,7 +305,6 @@ def clear_rows(grid, locked):
 				newKey = (x, y + inc)
 				locked[newKey] = locked.pop(key)
 	return inc
-
 
 
 def draw_next_shape(shape, win, cleared_line, level):
@@ -377,12 +402,12 @@ def main(win):
 	grid = create_grid(locked_pos)
 	change_piece = False
 	run = True
-	bag = [S, Z, S, Z]
+	bag = get_bag()
 	current_piece = get_shape(bag)
 	next_piece = get_shape(bag)
 	clock = pygame.time.Clock()
 	fall_time = 0
-	fall_speed = 0.17
+	fall_speed = 0.27
 	level = 1
 	lock = round(fall_speed * 140)
 	pts = 0
@@ -393,8 +418,6 @@ def main(win):
 	hold_piece = Piece(5, 0, O)
 
 	while run:
-		bag.pop(0)
-		bag.append(current_piece.shape)
 		grid = create_grid(locked_pos)
 		fall_time += clock.get_rawtime()
 		clock.tick()
@@ -431,6 +454,7 @@ def main(win):
 				if event.key == pygame.K_DOWN:
 					current_piece.y +=1
 					if not (valid_space(current_piece, grid)):
+						lock = 1
 						current_piece.y -=1
 				if event.key == pygame.K_UP:
 						while valid_space(current_piece, grid) and current_piece.y < 21:
@@ -468,7 +492,7 @@ def main(win):
 
 		shape_pos = convert_shape_format(current_piece)
 		ghost = copy.deepcopy(current_piece)
-		ghost.y = -25
+		ghost.y = current_piece.y
 		while valid_space(ghost, grid) and ghost.y < 22:
 			ghost.y += 1
 		while not valid_space(ghost, grid):
@@ -498,11 +522,9 @@ def main(win):
 				combo = 1
 			cleared_line += pts
 			while pts:
-				clear_rows(grid, locked_pos)
 				pts -= pts
 			lock = round(fall_speed * 140)
 			held = 0
-		
 		score = get_score(pts, score, combo, level)
 		draw_window(win, grid, score, combo)
 		draw_hold(win, hold_piece)
